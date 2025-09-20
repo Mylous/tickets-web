@@ -5,12 +5,12 @@
 <script>
   // Configuración de tu proyecto Firebase
   const firebaseConfig = {
-    apiKey: "TU_API_KEY",
-    authDomain: "TU_AUTH_DOMAIN",
-    projectId: "TU_PROJECT_ID",
-    storageBucket: "TU_STORAGE_BUCKET",
-    messagingSenderId: "TU_MESSAGING_SENDER_ID",
-    appId: "TU_APP_ID"
+    apiKey: "AIzaSyBo3UxLTkYOutD_uwUWm3jqneOhthXPPrw",
+    authDomain: "ticketedel-web.firebaseapp.com",
+    projectId: "Tticketedel-web",
+    storageBucket: "ticketedel-web.firebasestorage.app",
+    messagingSenderId: "111851130873",
+    appId: "1:111851130873:web:06c5a5e7a517184228b728"
   };
 
   // Inicializar Firebase
@@ -123,8 +123,24 @@
     const ticketCountSpan = document.getElementById('ticketCount');
     const timerDiv = document.getElementById('timer');
 
-    let tickets = 0;  // inicializamos en 0
+    // Inicialización de variables
+let tickets = 0;  // inicializamos en 0
 let countdownEnd = parseInt(localStorage.getItem('countdownEnd')) || null;
+
+// Función para cargar tickets desde Firestore
+async function loadTickets() {
+  const doc = await db.collection('tickets').doc('user1').get();
+  tickets = doc.exists ? doc.data().count : 0;
+  ticketCountSpan.textContent = tickets;
+}
+
+// Función para guardar tickets en Firestore
+async function saveTickets() {
+  await db.collection('tickets').doc('user1').set({ count: tickets });
+}
+
+// Mostrar tickets iniciales
+loadTickets();
 
 // Función para cargar tickets desde Firestore
 async function loadTickets() {
@@ -145,7 +161,6 @@ function updateTicketDisplay() {
   ticketCountSpan.textContent = tickets;
   saveTickets();  // ahora guarda en Firestore en lugar de localStorage
 }
-
     // Use ticket
     useBtn.addEventListener('click', () => {
       if(tickets > 0 && !countdownEnd) {
