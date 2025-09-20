@@ -1,9 +1,29 @@
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js"></script>
+
+<script>
+  // Configuración de tu proyecto Firebase
+  const firebaseConfig = {
+    apiKey: "TU_API_KEY",
+    authDomain: "TU_AUTH_DOMAIN",
+    projectId: "TU_PROJECT_ID",
+    storageBucket: "TU_STORAGE_BUCKET",
+    messagingSenderId: "TU_MESSAGING_SENDER_ID",
+    appId: "TU_APP_ID"
+  };
+
+  // Inicializar Firebase
+  const app = firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+</script>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Call Me Bro Tickets</title>
-  <style>
+ <style>
     body {
       font-family: 'Arial', sans-serif;
       background: linear-gradient(135deg, #ffe6f0, #ffd9e6);
@@ -85,7 +105,7 @@
   <h1>🎟️ Tickets for Call Me Bro</h1>
 
   <!-- Image below title -->
-  <img id="mainImage" src="ticket_to_bro_me" alt="Romantic Image">
+  <img id="mainImage" src="ticket_to_bro_me.png" alt="Romantic Image">
 
   <div class="ticket-info">
     <p>Available Tickets: <span id="ticketCount">0</span></p>
@@ -103,15 +123,28 @@
     const ticketCountSpan = document.getElementById('ticketCount');
     const timerDiv = document.getElementById('timer');
 
-    // Load tickets and countdown
-    let tickets = parseInt(localStorage.getItem('tickets')) || 0;
-    let countdownEnd = parseInt(localStorage.getItem('countdownEnd')) || null;
-    updateTicketDisplay();
+    let tickets = 0;  // inicializamos en 0
+let countdownEnd = parseInt(localStorage.getItem('countdownEnd')) || null;
 
-    function updateTicketDisplay() {
-      ticketCountSpan.textContent = tickets;
-      localStorage.setItem('tickets', tickets);
-    }
+// Función para cargar tickets desde Firestore
+async function loadTickets() {
+  const doc = await db.collection('tickets').doc('user1').get();
+  tickets = doc.exists ? doc.data().count : 0;
+  ticketCountSpan.textContent = tickets;
+}
+
+// Función para guardar tickets en Firestore
+async function saveTickets() {
+  await db.collection('tickets').doc('user1').set({ count: tickets });
+}
+
+// Mostrar tickets iniciales
+loadTickets();
+
+function updateTicketDisplay() {
+  ticketCountSpan.textContent = tickets;
+  saveTickets();  // ahora guarda en Firestore en lugar de localStorage
+}
 
     // Use ticket
     useBtn.addEventListener('click', () => {
@@ -169,4 +202,3 @@
   </script>
 </body>
 </html>
-
